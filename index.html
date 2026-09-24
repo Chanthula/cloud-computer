@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Cloud Computer V3</title>
+<style>
+:root{
+  --bg:#07111f;--panel:#0d1a2b;--panel2:#132238;--glass:rgba(14,27,45,.86);
+  --line:rgba(255,255,255,.10);--text:#edf5ff;--muted:#91a4bb;
+  --accent:#67b7ff;--accent2:#8d7dff;--good:#42d392;--danger:#ff657a;
+  --shadow:0 24px 70px rgba(0,0,0,.42);--radius:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;font-family:Inter,Segoe UI,Arial,sans-serif;background:#050b14;color:var(--text);overflow:hidden}
+button,input,textarea,select{font:inherit}
+button{border:0;cursor:pointer;color:inherit}
+.hidden{display:none!important}
+.screen{width:100%;height:100%}
+
+/* LOGIN */
+#loginScreen{display:grid;place-items:center;background:
+ radial-gradient(circle at 20% 20%,rgba(103,183,255,.18),transparent 32%),
+ radial-gradient(circle at 80% 80%,rgba(141,125,255,.18),transparent 35%),#050b14}
+.login-card{width:min(440px,92vw);padding:38px;background:rgba(10,20,34,.88);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);backdrop-filter:blur(22px)}
+.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:22px}
+.logo-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#06101d;font-weight:900}
+.login-card h1{font-size:32px;margin:30px 0 8px}.login-card p{color:var(--muted);margin:0 0 28px}
+.field{display:grid;gap:8px;margin:15px 0}.field label{font-size:13px;color:var(--muted)}
+.field input,.field select,.field textarea{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:#091525;color:var(--text);outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.primary{background:linear-gradient(135deg,var(--accent),#5b91ff);color:#06101d;font-weight:800;padding:12px 18px;border-radius:12px}
+.secondary{background:#16263c;padding:11px 16px;border-radius:12px}
+.danger{background:rgba(255,101,122,.14);color:#ff8999;padding:11px 16px;border-radius:12px}
+.small{font-size:12px;color:var(--muted)}
+
+/* DASHBOARD */
+#dashboard{display:flex;background:#07111f}
+.sidebar{width:250px;border-right:1px solid var(--line);background:#091525;padding:22px;display:flex;flex-direction:column}
+.sidebar nav{margin-top:35px;display:grid;gap:7px}
+.nav-btn{padding:12px 14px;text-align:left;background:transparent;border-radius:11px;color:var(--muted)}
+.nav-btn:hover,.nav-btn.active{background:#14253b;color:var(--text)}
+.side-bottom{margin-top:auto;color:var(--muted);font-size:12px;line-height:1.6}
+.main{flex:1;overflow:auto;padding:34px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:30px}
+.topbar h1{margin:0;font-size:30px}.topbar p{margin:6px 0 0;color:var(--muted)}
+.avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#07111f;font-weight:900}
+.toolbar{display:flex;gap:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+.pc-card{padding:20px;background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:0 12px 35px rgba(0,0,0,.15)}
+.pc-head{display:flex;justify-content:space-between;gap:10px}.pc-name{font-size:18px;font-weight:800}.status{font-size:11px;padding:5px 9px;border-radius:999px;background:rgba(66,211,146,.12);color:var(--good)}
+.status.off{background:rgba(255,255,255,.06);color:var(--muted)}
+.os{color:var(--muted);font-size:13px;margin-top:5px}
+.specs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}.spec{padding:10px;background:#091525;border-radius:12px}.spec b{display:block;font-size:15px}.spec span{font-size:10px;color:var(--muted)}
+.card-actions{display:flex;gap:8px}.card-actions button{flex:1}
+.empty{padding:50px 20px;text-align:center;border:1px dashed var(--line);border-radius:20px;color:var(--muted)}
+
+/* MODAL */
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.62);display:grid;place-items:center;z-index:500;backdrop-filter:blur(6px)}
+.modal{width:min(520px,92vw);background:#0b1829;border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:var(--shadow)}
+.modal-head{display:flex;justify-content:space-between;align-items:center}.modal h2{margin:0}.close{background:#15263b;border-radius:10px;padding:8px 11px}
+.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:22px}
+
+/* DESKTOP */
+#desktop{background:#07111f;position:relative}
+.wallpaper{position:absolute;inset:0;background:
+ radial-gradient(circle at 70% 20%,rgba(103,183,255,.20),transparent 30%),
+ radial-gradient(circle at 25% 80%,rgba(141,125,255,.18),transparent 32%),
+ linear-gradient(135deg,#081322,#0a1627 50%,#07111f);overflow:hidden}
+.wallpaper:after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:35px 35px}
+.desktop-icons{position:absolute;top:24px;left:22px;display:grid;gap:18px;z-index:5}
+.desktop-icon{width:78px;text-align:center;color:white;text-shadow:0 2px 5px #000;cursor:pointer}.desktop-icon .di{font-size:30px}.desktop-icon span{font-size:11px}
+.taskbar{position:absolute;left:14px;right:14px;bottom:12px;height:58px;background:rgba(8,18,31,.82);border:1px solid var(--line);border-radius:17px;backdrop-filter:blur(20px);display:flex;align-items:center;padding:7px;z-index:400;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.start-btn{width:45px;height:44px;border-radius:12px;background:#14263c;font-size:20px}
+.task-apps{display:flex;gap:5px;margin-left:7px}.task-app{min-width:44px;height:44px;border-radius:12px;background:transparent;font-size:20px}.task-app.active{background:#1a3049}
+.task-right{margin-left:auto;display:flex;align-items:center;gap:12px;padding:0 10px;color:var(--muted);font-size:12px}
+.start-menu{position:absolute;left:14px;bottom:80px;width:360px;background:rgba(9,20,34,.94);border:1px solid var(--line);border-radius:20px;padding:16px;z-index:450;backdrop-filter:blur(22px);box-shadow:var(--shadow)}
+.start-search{width:100%;padding:11px;border-radius:11px;border:1px solid var(--line);background:#07111f;color:white}.start-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}.start-item{padding:13px 4px;background:#102137;border-radius:12px;text-align:center;font-size:11px}.start-item div{font-size:22px;margin-bottom:4px}
+
+/* WINDOWS */
+.window{position:absolute;width:650px;height:440px;min-width:350px;min-height:250px;background:#0b1829;border:1px solid rgba(255,255,255,.13);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.48);z-index:50;overflow:hidden;resize:both}
+.titlebar{height:44px;background:#0e1d30;display:flex;align-items:center;padding:0 8px 0 14px;cursor:move;user-select:none}.titlebar b{font-size:13px}.window-controls{margin-left:auto;display:flex;gap:3px}.window-controls button{background:transparent;width:30px;height:30px;border-radius:8px}.window-controls button:hover{background:#172b43}.window-body{height:calc(100% - 44px);overflow:auto}
+.app-toolbar{height:50px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:7px 12px}.app-toolbar button{background:#14263c;padding:8px 11px;border-radius:9px;font-size:12px}
+.file-layout{display:flex;height:100%}.file-side{width:145px;border-right:1px solid var(--line);padding:12px}.file-side button{width:100%;padding:9px;text-align:left;background:transparent;border-radius:9px;color:var(--muted);font-size:12px}.file-side button:hover{background:#13253b;color:white}.file-main{flex:1;padding:14px}.file-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}.file{padding:14px 8px;background:#102137;border-radius:12px;text-align:center;cursor:pointer}.file .fi{font-size:28px}.file small{display:block;margin-top:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.editor{height:100%;display:flex;flex-direction:column}.editor input{margin:10px;padding:10px;background:#07111f;border:1px solid var(--line);border-radius:9px;color:white}.editor textarea{flex:1;resize:none;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;background:#07111f;color:#dce9f8;padding:15px;font-family:Consolas,monospace;outline:none}.editor .save{margin:10px;align-self:flex-end}
+.terminal{height:100%;background:#03070c;color:#d8f8df;padding:14px;font:13px Consolas,monospace;display:flex;flex-direction:column}.term-output{flex:1;overflow:auto;white-space:pre-wrap}.term-line{display:flex;gap:8px}.term-line span{color:#63e6a4}.term-input{flex:1;border:0;background:transparent;color:white;outline:0;font:inherit}
+.browser{height:100%;display:flex;flex-direction:column}.address{display:flex;gap:8px;padding:9px;border-bottom:1px solid var(--line)}.address input{flex:1;background:#07111f;color:white;border:1px solid var(--line);border-radius:9px;padding:8px}.browser-page{flex:1;padding:30px;overflow:auto}.browser-page h1{font-size:34px;margin:0 0 8px}.browser-card{padding:18px;background:#102137;border:1px solid var(--line);border-radius:15px;margin-top:18px}
+.settings{padding:18px}.setting-row{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid var(--line)}.toggle{width:45px;height:25px;border-radius:99px;background:#26384d;padding:3px}.toggle i{display:block;width:19px;height:19px;background:white;border-radius:50%;transition:.2s}.toggle.on{background:var(--good)}.toggle.on i{transform:translateX(20px)}
+.boot{position:absolute;inset:0;z-index:900;background:#050b14;display:grid;place-items:center}.boot-box{text-align:center}.spinner{width:55px;height:55px;border:4px solid #1a2c43;border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:auto auto 18px}@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;right:22px;bottom:88px;background:#102137;border:1px solid var(--line);padding:12px 16px;border-radius:12px;z-index:1000;box-shadow:var(--shadow);font-size:13px}
+@media(max-width:800px){.sidebar{width:72px;padding:14px}.sidebar .logo span,.sidebar nav span,.side-bottom{display:none}.main{padding:20px}.window{width:calc(100vw - 30px)!important;height:calc(100vh - 120px)!important;left:15px!important;top:15px!important}.start-menu{width:calc(100vw - 28px)}}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="screen">
+  <div class="login-card">
+    <div class="logo"><div class="logo-mark">☁</div><span>Cloud Computer</span></div>
+    <h1>Welcome back</h1>
+    <p>Your computers, files and apps — available from a browser.</p>
+    <div class="field"><label>Display name</label><input id="loginName" placeholder="e.g. Suvi"></div>
+    <button class="primary" style="width:100%" onclick="login()">Enter Cloud Computer</button>
+    <p class="small" style="margin-top:18px">V3 demo • data is stored locally in this browser.</p>
+  </div>
+</div>
+
+<div id="dashboard" class="screen hidden">
+  <aside class="sidebar">
+    <div class="logo"><div class="logo-mark">☁</div><span>Cloud Computer</span></div>
+    <nav>
+      <button class="nav-btn active" onclick="showDash()">⌂ <span>Overview</span></button>
+      <button class="nav-btn" onclick="openCreate()">＋ <span>Create computer</span></button>
+      <button class="nav-btn" onclick="toast('Account settings are part of the V4 roadmap.')">◎ <span>Account</span></button>
+    </nav>
+    <div class="side-bottom">V3 Prototype<br>Browser-native cloud OS concept</div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div><h1 id="hello">Your computers</h1><p>Run your digital workspace from almost any browser.</p></div>
+      <div class="avatar" id="avatar">U</div>
+    </div>
+    <div class="toolbar" style="margin-bottom:18px"><button class="primary" onclick="openCreate()">＋ Create a Computer</button><button class="secondary" onclick="refreshDashboard()">↻ Refresh</button></div>
+    <div id="pcGrid" class="grid"></div>
+  </main>
+</div>
+
+<div id="desktop" class="screen hidden">
+  <div class="wallpaper"></div>
+  <div class="desktop-icons">
+    <div class="desktop-icon" onclick="openApp('files')"><div class="di">📁</div><span>Files</span></div>
+    <div class="desktop-icon" onclick="openApp('browser')"><div class="di">🌐</div><span>Browser</span></div>
+    <div class="desktop-icon" onclick="openApp('terminal')"><div class="di">⌨️</div><span>Terminal</span></div>
+    <div class="desktop-icon" onclick="openApp('settings')"><div class="di">⚙️</div><span>Settings</span></div>
+  </div>
+  <div id="windows"></div>
+  <div id="startMenu" class="start-menu hidden">
+    <input class="start-search" placeholder="Search apps..." oninput="filterStart(this.value)">
+    <div id="startGrid" class="start-grid"></div>
+  </div>
+  <div class="taskbar">
+    <button class="start-btn" onclick="toggleStart()">◈</button>
+    <div id="taskApps" class="task-apps"></div>
+    <div class="task-right"><span id="desktopPcName">Cloud PC</span><span id="clock"></span><button onclick="powerMenu()" style="background:transparent">⏻</button></div>
+  </div>
+</div>
+
+<div id="modalWrap" class="modal-wrap hidden">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+const KEY='cloudComputerV3';
+const state=JSON.parse(localStorage.getItem(KEY)||'null')||{
+  user:'',
+  computers:[],
+  current:null,
+  files:[
+    {name:'Welcome.txt',type:'file',content:'Welcome to Cloud Computer V3!\\n\\nThis is your browser-based virtual workspace.'},
+    {name:'Documents',type:'folder'},
+    {name:'Projects',type:'folder'},
+    {name:'README.md',type:'file',content:'# Cloud Computer\\n\\nYour files live in the virtual storage of this prototype.'}
+  ],
+  nextId:1
+};
+let z=100, drag=null, currentFolder='';
+
+const apps={
+ files:{title:'File Manager',icon:'📁'},
+ browser:{title:'Browser',icon:'🌐'},
+ terminal:{title:'Terminal',icon:'⌨️'},
+ settings:{title:'Settings',icon:'⚙️'},
+ editor:{title:'Text Editor',icon:'📝'}
+};
+
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function $(id){return document.getElementById(id)}
+function login(){
+  const n=$('loginName').value.trim()||'User';
+  state.user=n; if(!state.computers.length) state.computers.push({id:state.nextId++,name:'My Cloud PC',os:'Cloud OS V3',cpu:4,ram:8,storage:80,status:'Stopped'});
+  save(); showDashboard();
+}
+function showDashboard(){
+  $('loginScreen').classList.add('hidden');$('desktop').classList.add('hidden');$('dashboard').classList.remove('hidden');
+  $('hello').textContent=(state.user?state.user+"'s":"Your")+" computers";
+  $('avatar').textContent=(state.user||'U')[0].toUpperCase();refreshDashboard();
+}
+function showDash(){showDashboard()}
+function refreshDashboard(){
+  const grid=$('pcGrid');
+  if(!state.computers.length){grid.innerHTML='<div class="empty">No computers yet.<br><br><button class="primary" onclick="openCreate()">Create your first computer</button></div>';return}
+  grid.innerHTML=state.computers.map(c=>`
+    <div class="pc-card">
+      <div class="pc-head"><div><div class="pc-name">${esc(c.name)}</div><div class="os">${esc(c.os)}</div></div>
+      <span class="status ${c.status==='Stopped'?'off':''}">${c.status}</span></div>
+      <div class="specs">
+        <div class="spec"><b>${c.cpu}</b><span>vCPU</span></div>
+        <div class="spec"><b>${c.ram} GB</b><span>RAM</span></div>
+        <div class="spec"><b>${c.storage} GB</b><span>Storage</span></div>
+      </div>
+      <div class="card-actions">
+        <button class="primary" onclick="bootComputer(${c.id})">${c.status==='Running'?'Open':'Start'}</button>
+        <button class="secondary" onclick="renamePC(${c.id})">Rename</button>
+        <button class="danger" onclick="deletePC(${c.id})">×</button>
+      </div>
+    </div>`).join('');
+}
+function openCreate(){
+  $('modalContent').innerHTML=`
+  <div class="modal-head"><h2>Create a Computer</h2><button class="close" onclick="closeModal()">×</button></div>
+  <p class="small">Configure your virtual computer. V3 simulates the compute layer in the browser.</p>
+  <div class="field"><label>Computer name</label><input id="newName" value="My Cloud PC"></div>
+  <div class="field"><label>Operating system</label><select id="newOS"><option>Cloud OS V3</option><option>Windows-style Workspace</option><option>Linux Workspace</option><option>Developer Workspace</option></select></div>
+  <div class="field"><label>CPU</label><select id="newCPU"><option value="2">2 vCPU</option><option value="4" selected>4 vCPU</option><option value="8">8 vCPU</option><option value="16">16 vCPU</option></select></div>
+  <div class="field"><label>Memory</label><select id="newRAM"><option value="4">4 GB</option><option value="8" selected>8 GB</option><option value="16">16 GB</option><option value="32">32 GB</option></select></div>
+  <div class="field"><label>Storage</label><select id="newStorage"><option value="40">40 GB</option><option value="80" selected>80 GB</option><option value="160">160 GB</option><option value="320">320 GB</option></select></div>
+  <div class="modal-actions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="createPC()">Create Computer</button></div>`;
+  $('modalWrap').classList.remove('hidden');
+}
+function createPC(){
+  const c={id:state.nextId++,name:$('newName').value.trim()||'Cloud PC',os:$('newOS').value,cpu:+$('newCPU').value,ram:+$('newRAM').value,storage:+$('newStorage').value,status:'Stopped'};
+  state.computers.push(c);save();closeModal();refreshDashboard();toast('Computer created successfully');
+}
+function closeModal(){$('modalWrap').classList.add('hidden')}
+function bootComputer(id){
+  const c=state.computers.find(x=>x.id===id); if(!c)return;
+  c.status='Booting';save();refreshDashboard();
+  setTimeout(()=>{c.status='Running';state.current=id;save();openDesktop(c)},1200);
+}
+function openDesktop(c){
+  $('dashboard').classList.add('hidden');$('desktop').classList.remove('hidden');
+  $('desktopPcName').textContent=c.name;
+  $('windows').innerHTML='';$('taskApps').innerHTML='';
+  setTimeout(()=>openApp('files'),250);
+  updateClock();
+}
+function closeDesktop(){
+  const c=state.computers.find(x=>x.id===state.current);if(c){c.status='Stopped';save()}
+  $('desktop').classList.add('hidden');showDashboard();
+}
+function powerMenu(){
+  $('modalContent').innerHTML=`
+  <div class="modal-head"><h2>Power</h2><button class="close" onclick="closeModal()">×</button></div>
+  <p>What do you want to do with <b>${esc(currentPC()?.name||'Cloud PC')}</b>?</p>
+  <div class="modal-actions" style="justify-content:space-between">
+    <button class="secondary" onclick="restartPC()">↻ Restart</button>
+    <button class="danger" onclick="shutdownPC()">⏻ Shut down</button>
+  </div>`;
+  $('modalWrap').classList.remove('hidden');
+}
+function currentPC(){return state.computers.find(c=>c.id===state.current)}
+function restartPC(){closeModal();$('windows').innerHTML='';toast('Restarting cloud computer…');setTimeout(()=>toast('Cloud computer restarted'),1000)}
+function shutdownPC(){closeModal();closeDesktop()}
+function renamePC(id){
+  const c=state.computers.find(x=>x.id===id), n=prompt('New computer name:',c.name);
+  if(n&&n.trim()){c.name=n.trim();save();refreshDashboard();toast('Computer renamed')}
+}
+function deletePC(id){
+  if(!confirm('Delete this computer?'))return;
+  state.computers=state.computers.filter(c=>c.id!==id);save();refreshDashboard();toast('Computer deleted');
+}
+function toggleStart(){$('startMenu').classList.toggle('hidden');renderStart()}
+function renderStart(filter=''){
+  const list=Object.entries(apps).filter(([k,v])=>v.title.toLowerCase().includes(filter.toLowerCase()));
+  $('startGrid').innerHTML=list.map(([k,v])=>`<button class="start-item" onclick="openApp('${k}');toggleStart()"><div>${v.icon}</div>${v.title}</button>`).join('');
+}
+function filterStart(v){renderStart(v)}
+function openApp(type,data={}){
+  if(!apps[type])return;
+  const existing=document.querySelector(`.window[data-app="${type}"]`);
+  if(existing){focusWin(existing);return}
+  const id='w'+Date.now();
+  const w=document.createElement('div');w.className='window';w.dataset.app=type;w.id=id;
+  w.style.left=(120+Math.random()*120)+'px';w.style.top=(55+Math.random()*70)+'px';w.style.zIndex=++z;
+  w.innerHTML=`<div class="titlebar" onmousedown="startDrag(event,'${id}')"><b>${apps[type].icon} ${apps[type].title}</b><div class="window-controls"><button onclick="minWin('${id}')">—</button><button onclick="maxWin('${id}')">□</button><button onclick="closeWin('${id}')">×</button></div></div><div class="window-body">${appBody(type,data)}</div>`;
+  $('windows').appendChild(w);addTask(type,id);focusWin(w);
+  if(type==='terminal')setTimeout(()=>document.querySelector('#'+id+' .term-input')?.focus(),50);
+}
+function appBody(type,data){
+  if(type==='files')return fileManager();
+  if(type==='browser')return browserApp();
+  if(type==='terminal')return terminalApp();
+  if(type==='settings')return settingsApp();
+  if(type==='editor')return editorApp(data);
+}
+function addTask(type,id){$('taskApps').insertAdjacentHTML('beforeend',`<button class="task-app active" id="task-${id}" onclick="focusWin(document.getElementById('${id}'))">${apps[type].icon}</button>`)}
+function focusWin(w){if(!w)return;w.style.zIndex=++z;document.querySelectorAll('.task-app').forEach(x=>x.classList.remove('active'));$('task-'+w.id)?.classList.add('active')}
+function closeWin(id){document.getElementById(id)?.remove();$('task-'+id)?.remove()}
+function minWin(id){const w=$(id);if(w)w.style.display=w.style.display==='none'?'block':'none'}
+function maxWin(id){const w=$(id);if(!w)return;if(w.dataset.max==='1'){w.style.left=w.dataset.l;w.style.top=w.dataset.t;w.style.width=w.dataset.w;w.style.height=w.dataset.h;w.dataset.max='0'}else{w.dataset.l=w.style.left;w.dataset.t=w.style.top;w.dataset.w=w.style.width;w.dataset.h=w.style.height;w.style.left='14px';w.style.top='14px';w.style.width='calc(100% - 28px)';w.style.height='calc(100% - 88px)';w.dataset.max='1'}focusWin(w)}
+function startDrag(e,id){
+  if(e.target.tagName==='BUTTON')return;
+  const w=$(id);focusWin(w);const r=w.getBoundingClientRect();drag={w,ox:e.clientX-r.left,oy:e.clientY-r.top};
+  document.onmousemove=ev=>{if(drag){drag.w.style.left=Math.max(0,ev.clientX-drag.ox)+'px';drag.w.style.top=Math.max(0,ev.clientY-drag.oy)+'px'}};
+  document.onmouseup=()=>{drag=null;document.onmousemove=null;document.onmouseup=null};
+}
+function fileManager(){
+  return `<div class="file-layout"><div class="file-side"><button>🏠 Home</button><button>📄 Documents</button><button>📁 Projects</button><button>⬇ Downloads</button><button>🗑 Trash</button></div><div class="file-main"><div class="app-toolbar" style="margin:-14px -14px 14px"><button onclick="newFile()">＋ New file</button><button onclick="newFolder()">＋ Folder</button><button onclick="refreshFiles()">↻ Refresh</button></div><div id="fileGrid" class="file-grid">${renderFiles()}</div></div></div>`;
+}
+function renderFiles(){
+  return state.files.map((f,i)=>`<div class="file" ondblclick="${f.type==='folder'?'toast(\\'Folder opened\\')':`openApp('editor',{index:${i}})`}" title="${esc(f.name)}"><div class="fi">${f.type==='folder'?'📁':'📄'}</div><small>${esc(f.name)}</small></div>`).join('');
+}
+function refreshFiles(){const g=document.querySelector('#fileGrid');if(g)g.innerHTML=renderFiles()}
+function newFile(){
+  const n=prompt('File name:','New Document.txt');if(!n)return;
+  state.files.push({name:n,type:'file',content:''});save();refreshFiles();toast('File created');
+}
+function newFolder(){
+  const n=prompt('Folder name:','New Folder');if(!n)return;
+  state.files.push({name:n,type:'folder'});save();refreshFiles();toast('Folder created');
+}
+function editorApp(data){
+  const f=state.files[data.index]||{name:'Untitled.txt',content:''};
+  return `<div class="editor"><input id="editName" value="${escAttr(f.name)}"><textarea id="editText">${esc(f.content||'')}</textarea><button class="primary save" onclick="saveEditor('${data.index}')">Save</button></div>`;
+}
+function saveEditor(index){
+  const i=+index,f=state.files[i];if(!f)return;
+  const w=document.querySelector('.window[data-app="editor"]');
+  f.name=w.querySelector('#editName').value||f.name;f.content=w.querySelector('#editText').value;save();toast('File saved');
+}
+function browserApp(){
+  return `<div class="browser"><div class="address"><input id="urlBox" value="cloud://home" onkeydown="if(event.key==='Enter')navigateBrowser(this.value)"><button class="secondary" onclick="navigateBrowser(document.querySelector('#urlBox').value)">Go</button></div><div id="browserPage" class="browser-page"><h1>Cloud Browser</h1><p class="small">A browser mock inside the Cloud Computer V3 environment.</p><div class="browser-card"><b>☁ Cloud Computer</b><p>Access your virtual workspace from a browser.</p></div><div class="browser-card"><b>Try these addresses</b><p>cloud://home &nbsp; • &nbsp; cloud://files &nbsp; • &nbsp; cloud://about</p></div></div></div>`;
+}
+function navigateBrowser(url){
+  const page=document.querySelector('.browser-page');if(!page)return;
+  url=url.trim();document.querySelector('#urlBox').value=url;
+  if(url==='cloud://files'){page.innerHTML='<h1>Files</h1><p class="small">Your virtual storage is available through File Manager.</p><div class="browser-card">📁 '+state.files.length+' items stored</div>'}
+  else if(url==='cloud://about'){page.innerHTML='<h1>About V3</h1><p>This prototype demonstrates the user experience of a browser-based cloud computer.</p>'}
+  else page.innerHTML='<h1>Cloud Computer</h1><p class="small">Welcome to your virtual web workspace.</p><div class="browser-card"><b>Address</b><p>'+esc(url)+'</p></div>';
+}
+function terminalApp(){
+  return `<div class="terminal"><div class="term-output" id="termOutput">Cloud Computer Terminal V3<br>Type <b>help</b> to see commands.<br><br></div><div class="term-line"><span>user@cloud:~$</span><input class="term-input" onkeydown="terminalKey(event,this)"></div></div>`;
+}
+function terminalKey(e,input){
+  if(e.key!=='Enter')return;
+  const out=input.closest('.terminal').querySelector('.term-output'),cmd=input.value.trim();input.value='';
+  let result='';
+  const parts=cmd.split(' '),base=parts[0].toLowerCase();
+  if(base==='help')result='help  clear  ls  pwd  whoami  date  neofetch  open  shutdown';
+  else if(base==='clear'){out.innerHTML='';return}
+  else if(base==='ls')result=state.files.map(f=>f.type==='folder'?f.name+'/':f.name).join('  ');
+  else if(base==='pwd')result='/home/'+(state.user||'user');
+  else if(base==='whoami')result=state.user||'user';
+  else if(base==='date')result=new Date().toString();
+  else if(base==='neofetch')result='☁ Cloud Computer V3\\nOS: Cloud OS V3\\nCPU: '+(currentPC()?.cpu||4)+' vCPU\\nRAM: '+(currentPC()?.ram||8)+' GB\\nStorage: '+(currentPC()?.storage||80)+' GB';
+  else if(base==='open'){if(parts[1]==='files')openApp('files');else if(parts[1]==='browser')openApp('browser');result='Opening '+(parts[1]||'app')+'...'}
+  else if(base==='shutdown'){setTimeout(shutdownPC,300);result='Shutting down...'}
+  else if(cmd)result='Command not found: '+cmd;
+  out.innerHTML+=`<div><span style="color:#63e6a4">user@cloud:~$</span> ${esc(cmd)}<br>${esc(result)}</div><br>`;out.scrollTop=out.scrollHeight;
+}
+function settingsApp(){
+  return `<div class="settings"><h2>Computer Settings</h2><p class="small">Customize this virtual computer.</p>
+  <div class="setting-row"><div><b>Dark interface</b><div class="small">Use the dark Cloud OS interface.</div></div><div class="toggle on"><i></i></div></div>
+  <div class="setting-row"><div><b>Animations</b><div class="small">Interface animations and transitions.</div></div><div class="toggle on" onclick="this.classList.toggle('on')"><i></i></div></div>
+  <div class="setting-row"><div><b>Virtual storage</b><div class="small">${state.files.length} items</div></div><button class="secondary" onclick="openApp('files')">Open Files</button></div>
+  <div class="setting-row"><div><b>Computer</b><div class="small">${esc(currentPC()?.name||'Cloud PC')}</div></div><button class="danger" onclick="shutdownPC()">Shut down</button></div>
+  </div>`;
+}
+function updateClock(){const f=()=>{const d=new Date();$('clock').textContent=d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});};f();setInterval(f,10000)}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.remove('hidden');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.add('hidden'),2200)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function escAttr(s){return esc(s)}
+$('modalWrap').addEventListener('click',e=>{if(e.target===$('modalWrap'))closeModal()});
+if(state.user){showDashboard()}else{$('loginScreen').classList.remove('hidden')}
+</script>
+</body>
+</html>
