@@ -164,6 +164,73 @@ const state=JSON.parse(localStorage.getItem(KEY)||'null')||{
   ],
   nextId:1
 };
+
+  const KEY = 'cloudComputerV3';
+
+const defaultState = {
+  user: '',
+  computers: [],
+  current: null,
+  files: [
+    {
+      name: 'Welcome.txt',
+      type: 'file',
+      content: 'Welcome to Cloud Computer V3!\n\nThis is your browser-based virtual workspace.'
+    },
+    {
+      name: 'Documents',
+      type: 'folder'
+    },
+    {
+      name: 'Projects',
+      type: 'folder'
+    },
+    {
+      name: 'README.md',
+      type: 'file',
+      content: '# Cloud Computer\n\nYour files live in the virtual storage of this prototype.'
+    }
+  ],
+  nextId: 1
+};
+
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(KEY));
+
+    if (!saved || typeof saved !== 'object') {
+      return structuredClone(defaultState);
+    }
+
+    return {
+      ...structuredClone(defaultState),
+      ...saved,
+      computers: Array.isArray(saved.computers) ? saved.computers : [],
+      files: Array.isArray(saved.files)
+        ? saved.files
+        : structuredClone(defaultState.files),
+      nextId: Number.isFinite(saved.nextId)
+        ? saved.nextId
+        : Math.max(
+            0,
+            ...(Array.isArray(saved.computers)
+              ? saved.computers.map(c => Number(c.id) || 0)
+              : [])
+          ) + 1
+    };
+  } catch (error) {
+    console.warn('Cloud Computer state reset:', error);
+    localStorage.removeItem(KEY);
+    return structuredClone(defaultState);
+  }
+}
+
+const state = loadState();
+
+let z = 100;
+let drag = null;
+let currentFolder = '';
+let clockTimer = null;
 let z=100, drag=null, currentFolder='';
 
 const apps={
